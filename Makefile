@@ -13,7 +13,6 @@ container-clean-up:
 container-debug:
 	@echo "${YELLOW}Debug Mode${COLOR_OFF}"
 	@docker run -it \
-		--env-file .env \
 		-v ${PWD}:${APP_DIR} \
 		-w ${APP_DIR} \
 		--rm --name ${APP_NAME} ${IMAGE} ${COMMAND}
