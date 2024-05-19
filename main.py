@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime
-from raw_data import getRawData
+from raw_data import getDataSet
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
@@ -11,7 +11,7 @@ import time
 def build_model():
     print("building model")
     # Convert timestamps to readable datetime
-    dates = getRawData() # [datetime.fromtimestamp(ts) for ts in timestamps]
+    dates = getDataSet() # [datetime.fromtimestamp(ts) for ts in timestamps]
     print("number of readtAt: ", len(dates))
     start_time = time.time()
 
@@ -20,32 +20,33 @@ def build_model():
 
     # Extract features
     df['hour'] = df['datetime'].dt.hour
+    # df['minute'] = df['datetime'].dt.minute # why not work with this?
     df['day_of_week'] = df['datetime'].dt.weekday
     df['is_weekend'] = df['day_of_week'].apply(lambda x: 1 if x > 4 else 0)
 
     # For the purpose of this example, let's assume the target is the hour of the day
-    df['target'] = df['hour']
+    df['target'] = df['hour'] # TODO create manually this target dt_now x schedule_dt
 
     # Drop the original datetime column
     df.drop('datetime', axis=1, inplace=True)
 
-    # print(df)
+    # print("df\n",df) # hour  day_of_week  is_weekend  target
 
     X = df.drop('target', axis=1)
-    y = df['target']
+    y = df['target'] # TODO how use two variables to target this
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # split data set
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) # why 42? what's random_state?
 
     # Initialize the model
-    clf = RandomForestClassifier(n_estimators=100, random_state=42)
+    clf = RandomForestClassifier(n_estimators=100, random_state=42) # why 42? what's random_state?
 
     # Train the model
     clf.fit(X_train.values, y_train)
+    print("model built in {} seconds".format(time.time() - start_time))
 
     # Predict on the test set
     y_pred = clf.predict(X_test.values)
-    print("model built in {} seconds".format(time.time() - start_time))
-
     # Evaluate the accuracy
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Accuracy: {accuracy}")
